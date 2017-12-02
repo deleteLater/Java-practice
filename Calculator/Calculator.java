@@ -22,6 +22,14 @@ public class Calculator {
 		new Calculator();
 	}
 	public static void calculate(String equation) {
+		if(equation.isEmpty()) {
+			return ;
+		}
+		//calculate when equations ends with operator
+		char lastCh = equation.charAt(equation.length()-1);
+		if( Character.isDigit(lastCh) || lastCh == '.' ) {
+			return ;
+		}
 		result = 0;
 		String str_num_temp = new String();
 		String str_nums = new String();
@@ -38,28 +46,20 @@ public class Calculator {
 			}
 		}
 		String nums[] = str_nums.split(",");
-		if(nums.length == 1) {
-			result += Double.valueOf(nums[0]);
-			return ;
-		}
 		result += Double.valueOf(nums[0]);
 		for(int i = 0; i < str_chs.length()-1;) {
 			switch (str_chs.toCharArray()[i]) {
 			case '+':
 				result += Double.valueOf(nums[++i]);
-				System.out.print(result+" ");
 				break;
 			case '-':
 				result -= Double.valueOf(nums[++i]);
-				System.out.print(result+" ");
 				break;
 			case '*':
 				result *= Double.valueOf(nums[++i]);
-				System.out.print(result+" ");
 				break;
 			case '/':
 				result /= Double.valueOf(nums[++i]);
-				System.out.print(result+" ");
 				break;
 			}
 		}
@@ -154,11 +154,13 @@ class MyButton extends JButton{
 				String str = bt.getCommand();
 				if(str.equals("C")) {
 					l_equation.updateMessage("Equation:");
-					l_result.updateMessage("Result:");
+					l_result.updateMessage("Result:0.0");
+					Calculator.result = 0;
 					return ;
 				}else if(str.equals("←") || str.equals("CE")) {
 					l_equation.removeLast();
-					l_result.updateMessage("Result:");
+					Calculator.calculate(l_equation.getContext().split(":")[1]);
+					l_result.updateResult();
 					return ;
 				}else if(str.equals("%")) {
 					if(Calculator.result == 0) {
@@ -206,9 +208,9 @@ class MyButton extends JButton{
 					Pattern p = Pattern.compile(".*=.");
 					if(curEquation.indexOf('=')!=curEquation.length()-1 && p.matcher(curEquation).matches()) {
 						l_equation.updateMessage("Equation:");
-						l_result.updateMessage("Result:");
+						l_result.updateMessage("Result:0.0");
 						return ;
-					}else if(str.equals("=")) {
+					}else {
 						Calculator.calculate(curEquation);
 						l_result.updateResult();
 					}
